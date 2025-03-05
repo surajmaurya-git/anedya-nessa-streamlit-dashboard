@@ -340,7 +340,7 @@ def graph_section(node_client=None):
 
         with datetime_cols[2]:
             reset_btn = st.button(
-                label="Live", on_click=reset_time_range, use_container_width=True
+                label="Default", on_click=reset_time_range, use_container_width=True
             )
             if reset_btn:
                 auto_update_time_range(True)
