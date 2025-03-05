@@ -396,14 +396,15 @@ def graph_section(node_client=None):
             if submit:
                 st.rerun()
 
-        for i in range(0, len(show_charts), 3):
-            graph_cols = st.columns([1, 1, 1], gap="small")
-            for j, chart in enumerate(show_charts[i : i + 3]):
+        number_of_graphs_per_row = [1]
+        for i in range(0, len(show_charts), len(number_of_graphs_per_row)):
+            graph_cols = st.columns(number_of_graphs_per_row, gap="small")
+            for j, chart in enumerate(show_charts[i : i + len(number_of_graphs_per_row)]):
                 with graph_cols[j]:
                     VARIABLE_KEY = get_variable_key_by_name(VARIABLES, chart)
                     if VARIABLE_KEY is not None:
                         VARIABLE = VARIABLES.get(VARIABLE_KEY)
-                        data=pd.DataFrame()
+                        # data=pd.DataFrame()
                         aggregate_or_value="value"
                         if interval <= 100080:
                             data=node_client.get_data(variable_identifier=VARIABLE.get("identifier"),from_time=st.session_state.from_input_time,to_time=st.session_state.to_input_time)
@@ -423,22 +424,25 @@ def graph_section(node_client=None):
                             maxData=data[aggregate_or_value].max()
                         
 
-                        draw_chart(
-                            chart_title=chart,
-                            chart_data=data,
-                            y_axis_title=VARIABLE.get("unit"),
-                            bottomRange=minData,
-                            topRange=maxData,
-                            agg=agg_interval,
-                            aggregate_or_value=aggregate_or_value
-                        )
+                        sub_graph_sec=st.columns([1,1],gap="small")
+                        with sub_graph_sec[0]:
+                            draw_chart(
+                                chart_title=chart,
+                                chart_data=data,
+                                y_axis_title=VARIABLE.get("unit"),
+                                bottomRange=minData,
+                                topRange=maxData,
+                                agg=agg_interval,
+                                aggregate_or_value=aggregate_or_value
+                            )
+                        with sub_graph_sec[1]:
+                            st.dataframe(data,use_container_width=True)
                     else:
                         st.subheader(chart)
                         st.error("Variable not found")
 def change_callback():
     global is_options_changed
     is_options_changed = True
-    print('multislect')
 
 def map_section(node_client=None):
     container = st.container(border=True)
