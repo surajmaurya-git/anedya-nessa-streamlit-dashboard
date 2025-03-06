@@ -446,31 +446,48 @@ def change_callback():
 
 def map_section(node_client=None):
     container = st.container(border=True)
+    currentTime = int(time.time())  # to means recent time
+    pastHour_Time = int(currentTime - 86400)
     with container:
         st.subheader(body="Device Location", anchor=False)
-        res = node_client.get_latestData("location")
-        if res.get("data") is not None:
-            location = res.get("data")
-            last_updated = res.get("timestamp")
-            indian_time_zone = pytz.timezone("Asia/Kolkata")  # set time zone
-            hr_timestamp = datetime.fromtimestamp(last_updated, indian_time_zone)
-            fm_hr_timestamp = hr_timestamp.strftime("%Y-%m-%d %H:%M:%S %Z")
-            st.markdown(f"**Last Updated:**  {fm_hr_timestamp}")
-
-            latitude = location.get("lat")
-            longitude = location.get("long")
-            locationData = pd.DataFrame(
-                {"latitude": [latitude], "longitude": [longitude]}
-            )
+        res = node_client.get_map_data("location", pastHour_Time, currentTime)
+        if not res.empty:
+            # st.write(res)
+            last_updated_time=res.iloc[0]["Datetime"]
+            st.markdown(f"**Last Updated:**  {last_updated_time}")
             st.map(
-                locationData,
-                zoom=13,
-                color="#0044ff",
-                size=50,
-                use_container_width=True,
-            )
+                    res,
+                    zoom=13,
+                    # latitude="lat",
+                    # longitude="long",
+                    color="#0044ff",
+                    size=50,
+                    use_container_width=True,
+                )
         else:
-            st.error("No Data Available")
+            res=node_client.get_latestData("location")
+            if res.get("data") is not None:
+                location = res.get("data")
+                last_updated = res.get("timestamp")
+                indian_time_zone = pytz.timezone("Asia/Kolkata")  # set time zone
+                hr_timestamp = datetime.fromtimestamp(last_updated, indian_time_zone)
+                fm_hr_timestamp = hr_timestamp.strftime("%Y-%m-%d %H:%M:%S %Z")
+                st.markdown(f"**Last Updated:**  {fm_hr_timestamp}")
+
+                latitude = location.get("lat")
+                longitude = location.get("long")
+                locationData = pd.DataFrame(
+                    {"latitude": [latitude], "longitude": [longitude]}
+                )
+                st.map(
+                    locationData,
+                    zoom=13,
+                    color="#0044ff",
+                    size=50,
+                    use_container_width=True,
+                )
+            else:
+                st.error("No Data Available")
 
 
 def get_variable_key_by_name(data, search_name):
