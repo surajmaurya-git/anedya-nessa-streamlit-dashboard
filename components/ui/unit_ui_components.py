@@ -375,16 +375,18 @@ def graph_section(node_client=None):
                 options.append(variable_name)
 
         # st.write(VARIABLES)
-
-        multislect_cols = st.columns([3.5,1,0.5], gap="medium",vertical_alignment="bottom")
-        if not options:  # Check for empty list
-            st.error("No variables available for selection.")
+        if not options:
+            st.error("No variables available")
             st.stop()
+        default_options=options[0]
+        if len(options)<=7:
+            default_options=options[0]
+        multislect_cols = st.columns([3.5,1,0.5], gap="medium",vertical_alignment="bottom")
         with multislect_cols[0]:
             show_charts = st.multiselect(
                 "Show Charts",
                 placeholder="Show Charts",
-                default=options[0],
+                default=default_options,
                 options=options,
                 label_visibility="hidden",
                 on_change=change_callback,

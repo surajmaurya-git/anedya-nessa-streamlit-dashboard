@@ -55,7 +55,7 @@ def initialize_session_state():
 
     # ======== UI controller ======================
     if "show_charts" not in st.session_state:
-        st.session_state.show_charts = ["Flow Rate"]
+        st.session_state.show_charts = []
 
     # ======== Time Range controller ================
     default_time_range=[]
