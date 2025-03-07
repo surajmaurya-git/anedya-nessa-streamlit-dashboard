@@ -377,10 +377,14 @@ def graph_section(node_client=None):
         # st.write(VARIABLES)
 
         multislect_cols = st.columns([3.5,1,0.5], gap="medium",vertical_alignment="bottom")
+        if not options:  # Check for empty list
+            st.error("No variables available for selection.")
+            st.stop()
         with multislect_cols[0]:
             show_charts = st.multiselect(
                 "Show Charts",
                 placeholder="Show Charts",
+                default=options[0],
                 options=options,
                 label_visibility="hidden",
                 on_change=change_callback,
@@ -389,6 +393,7 @@ def graph_section(node_client=None):
                 is_options_changed = False
                 if show_charts != st.session_state.show_charts:
                     st.session_state.show_charts = show_charts
+            
         with multislect_cols[1]:
             pass
         with multislect_cols[2]:
@@ -397,9 +402,9 @@ def graph_section(node_client=None):
                 st.rerun()
 
         number_of_graphs_per_row = [1]
-        for i in range(0, len(show_charts), len(number_of_graphs_per_row)):
+        for i in range(0, len(st.session_state.show_charts), len(number_of_graphs_per_row)):
             graph_cols = st.columns(number_of_graphs_per_row, gap="small")
-            for j, chart in enumerate(show_charts[i : i + len(number_of_graphs_per_row)]):
+            for j, chart in enumerate(st.session_state.show_charts[i : i + len(number_of_graphs_per_row)]):
                 with graph_cols[j]:
                     VARIABLE_KEY = get_variable_key_by_name(VARIABLES, chart)
                     if VARIABLE_KEY is not None:
