@@ -1,5 +1,6 @@
 streamlit
-google-cloud
+google-cloud<0.34.0
+protobuf<5.29.3
 firestore
 pandas
 altair
