@@ -80,6 +80,7 @@ def drawLogin():
             submit_button = st.button(label="Submit")
             if submit_button:
                 check_credentials(username_inp, password_inp)
+                print()
             
 
 def check_credentials(username,password):
