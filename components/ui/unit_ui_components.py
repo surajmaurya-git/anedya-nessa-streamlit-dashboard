@@ -380,7 +380,7 @@ def graph_section(node_client=None):
             st.stop()
         default_options=options[0]
         if len(options)<=7:
-            default_options=options[0]
+            default_options=options[2]
         multislect_cols = st.columns([3.5,1,0.5], gap="medium",vertical_alignment="bottom")
         with multislect_cols[0]:
             show_charts = st.multiselect(
@@ -437,8 +437,8 @@ def graph_section(node_client=None):
                                 chart_title=chart,
                                 chart_data=data,
                                 y_axis_title=VARIABLE.get("unit"),
-                                bottomRange=minData,
-                                topRange=maxData,
+                                bottomRange=VARIABLE.get("bottom_range"),
+                                topRange=VARIABLE.get("top_range"),
                                 agg=agg_interval,
                                 aggregate_or_value=aggregate_or_value
                             )
@@ -472,7 +472,7 @@ def map_section(node_client=None):
                     use_container_width=True,
                 )
         else:
-            res=node_client.get_latestData("location")
+            res=node_client.get_latestData("Location")
             if res.get("data") is not None:
                 location = res.get("data")
                 last_updated = res.get("timestamp")
