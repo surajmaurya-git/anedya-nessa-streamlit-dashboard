@@ -18,8 +18,13 @@ def drawAdminDashboard():
                 st.stop()
 
         for i in range(1, NUMBER_OF_NODES ):
-            with open(f"{current_dir}/nodes/{NODES_NAME}_{i}.py", "w") as fp:
-                fp.write(file_content)
+            file_path = f"{current_dir}/nodes/{NODES_NAME}_{i}.py"
+            if not os.path.isfile(file_path):
+                with open(file_path, "w") as fp:
+                    print("Created node file")
+                    fp.write(file_content)
+            else:
+                print("Node file already exists")
 
     pages = {
         "Admin": [

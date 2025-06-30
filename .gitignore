@@ -173,3 +173,6 @@ Home copy.py
 
 # Maintain Credentials Secrecy
 secrets.toml
+
+/nodes/*.py
+!/nodes/node.py
