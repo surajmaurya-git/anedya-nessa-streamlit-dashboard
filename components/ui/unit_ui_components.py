@@ -437,8 +437,8 @@ def graph_section(node_client=None):
                                 chart_title=chart,
                                 chart_data=data,
                                 y_axis_title=VARIABLE.get("unit"),
-                                bottomRange=VARIABLE.get("bottom_range"),
-                                topRange=VARIABLE.get("top_range"),
+                                bottomRange=(minData-(minData*0.2)),
+                                topRange=(maxData + (maxData * 0.2)),
                                 agg=agg_interval,
                                 aggregate_or_value=aggregate_or_value
                             )

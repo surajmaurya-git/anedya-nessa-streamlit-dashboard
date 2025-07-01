@@ -16,8 +16,9 @@ def draw_chart(chart_title: str = None, chart_data=None, y_axis_title: str = Non
         return
 
     if chart_data is not None and not chart_data.empty:
+        last_data = chart_data[aggregate_or_value].iloc[0]
         st.markdown(
-            f"**Agg**: {agg} min | **Min:** {chart_data[aggregate_or_value].min():.2f} **Max:** {chart_data[aggregate_or_value].max():.2f} **Average:** {chart_data[aggregate_or_value].mean():.2f} "
+            f"**Agg**: {agg} min | **Min:** {chart_data[aggregate_or_value].min():.2f} **Max:** {chart_data[aggregate_or_value].max():.2f} **Average:** {chart_data[aggregate_or_value].mean():.2f} **Last:** {last_data:.2f}"
         )
 
         
