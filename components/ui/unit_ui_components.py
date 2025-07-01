@@ -148,6 +148,7 @@ def gauge_section(node_client=None):
             else:
                 st.error("No Data Available")
 
+
 def sync_controllers_state(node_client=None):
 
     res = node_client.get_valueStore(key="door")
@@ -239,6 +240,12 @@ def controllers_section(node_client=None):
                     st.session_state.massage = "Turn Massager On"
                     node_client.set_valueStore(key="massage", value=0, type="float")
                 st.rerun()
+
+
+def handle_change(*args, **kwargs):
+    st.write("Selection changed!")
+    st.write("Args:", args)
+    st.write("Kwargs:", kwargs)
 
 
 def graph_section(node_client=None):
@@ -378,44 +385,55 @@ def graph_section(node_client=None):
         if not options:
             st.error("No variables available")
             st.stop()
-        default_options=options[0]
-        if len(options)<=7:
-            default_options=options[2]
-        multislect_cols = st.columns([3.5,1,0.5], gap="medium",vertical_alignment="bottom")
+        multislect_cols = st.columns(
+            [3.5, 1, 0.5], gap="medium", vertical_alignment="bottom"
+        )
         with multislect_cols[0]:
+            print(st.session_state.show_charts)
             show_charts = st.multiselect(
                 "Show Charts",
                 placeholder="Show Charts",
-                default=default_options,
                 options=options,
+                default=st.session_state.show_charts,
                 label_visibility="hidden",
                 on_change=change_callback,
             )
-            if len(show_charts) > 0 or is_options_changed:
-                is_options_changed = False
-                if show_charts != st.session_state.show_charts:
-                    st.session_state.show_charts = show_charts
-            
+            # if  is_options_changed:
+            #     if show_charts != st.session_state.show_charts:
+            #         st.session_state.show_charts = show_charts
+            #     is_options_changed = False
+            if(st.session_state.show_charts != show_charts):
+                st.session_state.show_charts = show_charts
+                st.rerun()
+
         with multislect_cols[1]:
             pass
         with multislect_cols[2]:
-            submit=st.button(label="Submit",use_container_width=True)
+            submit = st.button(label="Submit", use_container_width=True)
             if submit:
                 st.rerun()
 
         number_of_graphs_per_row = [1]
-        for i in range(0, len(st.session_state.show_charts), len(number_of_graphs_per_row)):
+        for i in range(
+            0, len(st.session_state.show_charts), len(number_of_graphs_per_row)
+        ):
             graph_cols = st.columns(number_of_graphs_per_row, gap="small")
-            for j, chart in enumerate(st.session_state.show_charts[i : i + len(number_of_graphs_per_row)]):
+            for j, chart in enumerate(
+                st.session_state.show_charts[i : i + len(number_of_graphs_per_row)]
+            ):
                 with graph_cols[j]:
                     VARIABLE_KEY = get_variable_key_by_name(VARIABLES, chart)
                     if VARIABLE_KEY is not None:
                         VARIABLE = VARIABLES.get(VARIABLE_KEY)
                         # data=pd.DataFrame()
-                        aggregate_or_value="value"
+                        aggregate_or_value = "value"
                         if interval <= 100080:
-                            data=node_client.get_data(variable_identifier=VARIABLE.get("identifier"),from_time=st.session_state.from_input_time,to_time=st.session_state.to_input_time)
-                            aggregate_or_value="value"
+                            data = node_client.get_data(
+                                variable_identifier=VARIABLE.get("identifier"),
+                                from_time=st.session_state.from_input_time,
+                                to_time=st.session_state.to_input_time,
+                            )
+                            aggregate_or_value = "value"
                         else:
                             data = node_client.get_aggData(
                                 variable_identifier=VARIABLE.get("identifier"),
@@ -423,33 +441,35 @@ def graph_section(node_client=None):
                                 to_time=st.session_state.to_input_time,
                                 agg_interval_mins=agg_interval,
                             )
-                            aggregate_or_value="aggregate"
-                        minData=0
-                        maxData=0
+                            aggregate_or_value = "aggregate"
+                        minData = 0
+                        maxData = 0
                         if not data.empty:
-                            minData=data[aggregate_or_value].min()
-                            maxData=data[aggregate_or_value].max()
-                        
+                            minData = data[aggregate_or_value].min()
+                            maxData = data[aggregate_or_value].max()
 
-                        sub_graph_sec=st.columns([1,1],gap="small")
+                        sub_graph_sec = st.columns([1, 1], gap="small")
                         with sub_graph_sec[0]:
                             draw_chart(
                                 chart_title=chart,
                                 chart_data=data,
                                 y_axis_title=VARIABLE.get("unit"),
-                                bottomRange=(minData-(minData*0.2)),
+                                bottomRange=(minData - (minData * 0.2)),
                                 topRange=(maxData + (maxData * 0.2)),
                                 agg=agg_interval,
-                                aggregate_or_value=aggregate_or_value
+                                aggregate_or_value=aggregate_or_value,
                             )
                         with sub_graph_sec[1]:
-                            st.dataframe(data,use_container_width=True)
+                            st.dataframe(data, use_container_width=True)
                     else:
                         st.subheader(chart)
                         st.error("Variable not found")
+
+
 def change_callback():
     global is_options_changed
     is_options_changed = True
+
 
 def map_section(node_client=None):
     container = st.container(border=True)
@@ -460,19 +480,19 @@ def map_section(node_client=None):
         res = node_client.get_map_data("location", pastHour_Time, currentTime)
         if not res.empty:
             # st.write(res)
-            last_updated_time=res.iloc[0]["Datetime"]
+            last_updated_time = res.iloc[0]["Datetime"]
             st.markdown(f"**Last Updated:**  {last_updated_time}")
             st.map(
-                    res,
-                    zoom=13,
-                    # latitude="lat",
-                    # longitude="long",
-                    color="#0044ff",
-                    size=50,
-                    use_container_width=True,
-                )
+                res,
+                zoom=13,
+                # latitude="lat",
+                # longitude="long",
+                color="#0044ff",
+                size=50,
+                use_container_width=True,
+            )
         else:
-            res=node_client.get_latestData("Location")
+            res = node_client.get_latestData("Location")
             if res.get("data") is not None:
                 location = res.get("data")
                 last_updated = res.get("timestamp")
