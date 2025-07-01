@@ -16,7 +16,7 @@ DASHBOARD_NAME=st.secrets["DASHBOARD_NAME"]
 st.set_page_config(page_title=DASHBOARD_NAME, layout="wide")
 
 refresh_interval = 30000
-st_autorefresh(interval=refresh_interval, limit=None, key="auto-refresh-handler")
+st_autorefresh(interval=refresh_interval, limit=None, key="auto-refresh-handler", debounce=True)
 
 
 # --------------- HELPER FUNCTIONS -----------------------

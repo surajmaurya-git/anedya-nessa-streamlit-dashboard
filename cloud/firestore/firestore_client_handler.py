@@ -11,8 +11,9 @@ def firebase_db_setup():
     FIREBASE_PRIVATE_KEY_JSON = json.loads(FIREBASE_PRIVATE_KEY)
     curt_dir = os.getcwd()
     FIREBASE_PRIVATE_KEY_PATH = f"{curt_dir}/cloud/firestore/FIREBASE_PRIVATE_KEY.json"
-    with open(FIREBASE_PRIVATE_KEY_PATH, "w") as outfile:
-        json.dump(FIREBASE_PRIVATE_KEY_JSON, outfile)
+    if not os.path.isfile(FIREBASE_PRIVATE_KEY_PATH):
+        with open(FIREBASE_PRIVATE_KEY_PATH, "w") as outfile:
+            json.dump(FIREBASE_PRIVATE_KEY_JSON, outfile)
 
     st.session_state.firestore_client = firestore.Client.from_service_account_json(
         FIREBASE_PRIVATE_KEY_PATH
