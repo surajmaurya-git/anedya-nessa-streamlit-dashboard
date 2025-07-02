@@ -19,9 +19,9 @@ def drawUsersDashboard():
     }
     st.logo(f"{current_dir}/images/logo.png",size="large")
     DASHBOARD_NAME=st.secrets["DASHBOARD_NAME"]
-    st.sidebar.subheader(DASHBOARD_NAME)
+    # st.sidebar.subheader(DASHBOARD_NAME)
     ABOUT_DASHBOARD=st.secrets["ABOUT_DASHBOARD"]
-    st.sidebar.markdown(ABOUT_DASHBOARD)
+    # st.sidebar.markdown(ABOUT_DASHBOARD)
     if len(st.session_state.user_permissions) > 0:
         pg = st.navigation(pages)
         pg.run()
