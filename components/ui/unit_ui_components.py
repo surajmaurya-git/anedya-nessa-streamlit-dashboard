@@ -25,15 +25,16 @@ def unit_header(title, des=None, node_client=None, device_status_res=None):
     with headercols[0]:
         st.title(title, anchor=False)
     with headercols[1]:
-        if device_status_res is not None or device_status_res.get("status") is True:
-            device_status = None
-            if device_status_res.get("device_status"):
-                device_status = "Online"
-            else:
-                device_status = "Offline"
-        else:
-            device_status = "..."
-        st.button(device_status, disabled=True, use_container_width=True)
+        # if device_status_res is not None or device_status_res.get("status") is True:
+        #     device_status = None
+        #     if device_status_res.get("device_status"):
+        #         device_status = "Online"
+        #     else:
+        #         device_status = "Offline"
+        # else:
+        #     device_status = "..."
+        # st.button(device_status, disabled=True, use_container_width=True)
+        pass
     with headercols[2]:
         on = st.button("Refresh")
         if on:
@@ -103,9 +104,51 @@ def gauge_section(node_client=None):
     with container:
 
         indian_time_zone = pytz.timezone("Asia/Kolkata")  # set time zone
-        r1_guage_cols = st.columns([1, 1, 1], gap="small")
-
+        r1_guage_cols = st.columns([1, 1, 1,1], gap="small")
         with r1_guage_cols[0]:
+            VARIABLE = VARIABLES["variable_1"]
+            data = node_client.get_latestData(VARIABLE["identifier"])
+            if data.get("data") != None:
+                timestamp = data.get("timestamp")
+                hr_timestamp = datetime.fromtimestamp(timestamp, indian_time_zone)
+                fm_hr_timestamp = hr_timestamp.strftime("%Y-%m-%d %H:%M:%S %Z")
+                st.markdown(f"**Last Updated:** {fm_hr_timestamp}")
+                value = data.get("data")
+                sv.gauge(
+                    value,
+                    VARIABLE["name"],
+                    gMode="number",
+                    cWidth=True,
+                    gSize="MED",
+                    sFix=VARIABLE["unit"],
+                    arTop=int(VARIABLE["top_range"]),
+                    arBot=int(VARIABLE["bottom_range"]),
+                )
+            else:
+                st.error("No Data Available")
+        with r1_guage_cols[1]:
+            VARIABLE = VARIABLES["variable_2"]
+            data = node_client.get_latestData(VARIABLE["identifier"])
+            if data.get("data") != None:
+                timestamp = data.get("timestamp")
+                hr_timestamp = datetime.fromtimestamp(timestamp, indian_time_zone)
+                fm_hr_timestamp = hr_timestamp.strftime("%Y-%m-%d %H:%M:%S %Z")
+                st.markdown(f"**Last Updated:** {fm_hr_timestamp}")
+                value = data.get("data")
+                sv.gauge(
+                    value,
+                    VARIABLE["name"],
+                    gMode="number",
+                    cWidth=True,
+                    gSize="MED",
+                    sFix=VARIABLE["unit"],
+                    arTop=int(VARIABLE["top_range"]),
+                    arBot=int(VARIABLE["bottom_range"]),
+                )
+            else:
+                st.error("No Data Available")
+
+        with r1_guage_cols[2]:
             VARIABLE = VARIABLES["variable_3"]
             data = node_client.get_latestData(VARIABLE["identifier"])
             if data.get("data") != None:
@@ -125,7 +168,7 @@ def gauge_section(node_client=None):
                 )
             else:
                 st.error("No Data Available")
-        with r1_guage_cols[1]:
+        with r1_guage_cols[3]:
             VARIABLE = VARIABLES["variable_4"]
             data = node_client.get_latestData(VARIABLE["identifier"])
             if data.get("data") != None:
