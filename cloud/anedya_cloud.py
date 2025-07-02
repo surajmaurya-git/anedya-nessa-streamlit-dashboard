@@ -43,22 +43,44 @@ class NewNode:
         return get_data(
             variable_identifier, self.nodeId, from_time, to_time, self.API_KEY
         )
+
     def get_map_data(
         self, variable_identifier: str, from_time: int, to_time: int
     ) -> pd.DataFrame:
         return get_map_data(
             variable_identifier, self.nodeId, from_time, to_time, self.API_KEY
         )
-    
-    def get_aggData(self, variable_identifier: str, from_time: int, to_time: int, agg_interval_mins:int=10) -> pd.DataFrame:
-        return anedya_getAggData(variable_identifier, self.nodeId, from_time, to_time, self.API_KEY, agg_interval_mins)
 
-    def get_valueStore(self, key: str = "",scope: str = "node", id: str = "" ) -> dict:
+    def get_aggData(
+        self,
+        variable_identifier: str,
+        from_time: int,
+        to_time: int,
+        agg_interval_mins: int = 10,
+    ) -> pd.DataFrame:
+        return anedya_getAggData(
+            variable_identifier,
+            self.nodeId,
+            from_time,
+            to_time,
+            self.API_KEY,
+            agg_interval_mins,
+        )
+
+    def get_valueStore(self, key: str = "", scope: str = "node", id: str = "") -> dict:
         return anedya_getValueStore(self.API_KEY, self.nodeId, scope, id, key)
-    
-    def set_valueStore(self, key: str = "", value: str = "",type: str = "",scope: str = "node", id: str = "") -> dict:
-        return anedya_setValueStore(self.API_KEY, self.nodeId, scope, id, key, value,type)
-    
+
+    def set_valueStore(
+        self,
+        key: str = "",
+        value: str = "",
+        type: str = "",
+        scope: str = "node",
+        id: str = "",
+    ) -> dict:
+        return anedya_setValueStore(
+            self.API_KEY, self.nodeId, scope, id, key, value, type
+        )
 
 
 @st.cache_data(ttl=40, show_spinner=False)
@@ -178,7 +200,8 @@ def get_data(
             df = pd.DataFrame(data_list)
 
             if df.duplicated(subset=["timestamp"]).any():
-                st.warning("Found duplicate datapoints.")
+                pass
+                # st.warning("Found duplicate datapoints.")
 
             # Remove similar data points
             df.drop_duplicates(subset=["timestamp"], keep="first", inplace=True)
@@ -187,6 +210,7 @@ def get_data(
             df["Datetime"] = (
                 df["Datetime"].dt.tz_localize("UTC").dt.tz_convert(local_tz)
             )
+            df["Datetime"] = df["Datetime"].dt.strftime("%Y-%m-%d %H:%M:%S")
             df.set_index("Datetime", inplace=True)
 
             # Droped the original 'timestamp' column as it's no longer needed
@@ -202,7 +226,8 @@ def get_data(
         print(response_message[0])
         value = pd.DataFrame()
         return value
-    
+
+
 @st.cache_data(ttl=30, show_spinner=False)
 def get_map_data(
     variable_identifier: str,
@@ -257,7 +282,8 @@ def get_map_data(
             df = pd.DataFrame(data_list)
 
             if df.duplicated(subset=["timestamp"]).any():
-                st.warning("Found duplicate datapoints.")
+                pass
+                # st.warning("Found duplicate datapoints.")
             # print(df)
 
             # Remove similar data points
@@ -282,6 +308,7 @@ def get_map_data(
         print(response_message[0])
         value = pd.DataFrame()
         return value
+
 
 @st.cache_data(ttl=30, show_spinner=False)
 def anedya_getAggData(
@@ -317,7 +344,9 @@ def anedya_getAggData(
         "Authorization": apiKey_in_formate,
     }
 
-    response = st.session_state.http_client.request("POST", url, headers=headers, data=payload)
+    response = st.session_state.http_client.request(
+        "POST", url, headers=headers, data=payload
+    )
     response_message = response.text
 
     if response.status_code == 200:
@@ -334,15 +363,18 @@ def anedya_getAggData(
             df = pd.DataFrame(data_list)
 
             if df.duplicated(subset=["timestamp"]).any():
-                st.warning("Found duplicate datapoints.")
+                pass
+                # st.warning("Found duplicate datapoints.")
                 # Remove similar data points
                 df.drop_duplicates(subset=["timestamp"], keep="first", inplace=True)
-                
+
             df["Datetime"] = pd.to_datetime(df["timestamp"], unit="s")
             local_tz = pytz.timezone("Asia/Kolkata")  # Change to your local time zone
             df["Datetime"] = (
                 df["Datetime"].dt.tz_localize("UTC").dt.tz_convert(local_tz)
             )
+            # Strip timezone info
+            df["Datetime"] = df["Datetime"].dt.strftime("%Y-%m-%d %H:%M:%S")
             df.set_index("Datetime", inplace=True)
 
             # Droped the original 'timestamp' column as it's no longer needed
@@ -366,7 +398,7 @@ def anedya_getValueStore(
     nodeId,
     scope: str,
     id: str,
-    key:str,
+    key: str,
 ) -> dict:
     url = "https://api.anedya.io/v1/valuestore/getValue"
 
@@ -396,17 +428,18 @@ def anedya_getValueStore(
     else:
         print(responseMessage)
         # st.write("No previous value!!")
-        value = {"isSuccess": False, "key": key, "value": None,"error": responseMessage}
+        value = {
+            "isSuccess": False,
+            "key": key,
+            "value": None,
+            "error": responseMessage,
+        }
 
     return value
+
+
 def anedya_setValueStore(
-    apiKey,
-    nodeId,
-    scope: str,
-    id: str,
-    key:str,
-    value,
-    type: str
+    apiKey, nodeId, scope: str, id: str, key: str, value, type: str
 ) -> dict:
     url = "https://api.anedya.io/v1/valuestore/setValue"
 
@@ -454,6 +487,6 @@ def anedya_setValueStore(
     else:
         print(responseMessage)
         # st.write("No previous value!!")
-        value = {"isSuccess": False,"res": responseMessage}
+        value = {"isSuccess": False, "res": responseMessage}
 
     return value

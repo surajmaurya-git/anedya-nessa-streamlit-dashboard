@@ -98,7 +98,7 @@ def cards_section(data: dict = None):
 
 
 def gauge_section(node_client=None):
-    container = st.container(border=True, height=300)
+    container = st.container(border=True, height=330)
     VARIABLES = st.session_state.variables
     with container:
 
@@ -460,6 +460,7 @@ def graph_section(node_client=None):
                                 aggregate_or_value=aggregate_or_value,
                             )
                         with sub_graph_sec[1]:
+                        
                             st.dataframe(data, use_container_width=True)
                     else:
                         st.subheader(chart)
