@@ -29,7 +29,7 @@ hide_streamlit_style = """
         # height: 0%;
         # }
         section[data-testid="stSidebar"] {
-            width: 100px !important; # Set the width to your desired value
+            width: 210px !important; # Set the width to your desired value
         }
         </style>
         """
