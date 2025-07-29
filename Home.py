@@ -84,14 +84,10 @@ def drawLogin():
             
 
 def check_credentials(username,password):
-    if username =="admin@gmail.com":
-        user_details = st.session_state.firestore_client.collection("users").document(username).get().to_dict()
-        if user_details is None:
-          email="admin@gmail.com"
-          name="Super Admin"
-          password="admin"
-          permissions=["ALL"]
-          st.session_state.firestore_client.collection("users").document(email).set({"name":name,"role":"admin","email":email,"password":password,"permissions":permissions,"variables_access":['ALL']},merge=True)
+    if username == st.secrets["ADMIN_EMAIL"] and password == st.secrets["ADMIN_CRED"]:
+        st.session_state.view_role = "admin"
+        st.session_state.LoggedIn = True
+        st.rerun()
 
     user_details = st.session_state.firestore_client.collection("users").document(username).get().to_dict()
     if user_details is None:
